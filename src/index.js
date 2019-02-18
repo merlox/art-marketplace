@@ -7,7 +7,7 @@ import { Cert } from '@0xcert/cert'
 // Assets Ledgers are groups of tokens that are managed by certain users just like mods in a chat to do what's required
 // The Capabilities determine what those mods can do with the assets they are managing
 // The Ethereum address that deploys this ledger has full powers to do whatever he wants as the administrator
-import { AssetLedger, AssetLedgerCapabilities } from '@0xcert/ethereum-asset-ledger'
+import { AssetLedger, AssetLedgerCapability } from '@0xcert/ethereum-asset-ledger'
 
 class Main extends React.Component {
     constructor() {
@@ -16,16 +16,27 @@ class Main extends React.Component {
             provider: {}
         }
         this.createNewAsset()
+        // this.start()
     }
 
     async start() {
-        const provider = new MetamaskProvider()
-        const ledgerId = '0xeF5781A2c04113e29bE5724ae6E30bC287610007'
-        const ledger = new AssetLedger(provider, ledgerId)
-        const balance = await ledger.getBalance('0xeF5781A2c04113e29bE5724ae6E30bC287610007')
-        await this.setState({provider})
-        console.log('balance', balance)
+        await this.setProvider()
+        await this.deployNewAssetLedger()
     }
+
+    async setProvider() {
+        const provider = new MetamaskProvider()
+        await this.setState({provider})
+    }
+
+    // async start() {
+    //     const provider = new MetamaskProvider()
+    //     const ledgerId = '0xeF5781A2c04113e29bE5724ae6E30bC287610007'
+    //     const ledger = new AssetLedger(provider, ledgerId)
+    //     const balance = await ledger.getBalance('0xeF5781A2c04113e29bE5724ae6E30bC287610007')
+    //     await this.setState({provider})
+    //     console.log('balance', balance)
+    // }
 
     // To generate new ERC721 assets
     async createNewAsset() {
@@ -33,7 +44,7 @@ class Main extends React.Component {
             schema: schema88
         })
         const asset = {
-            description: 'An lighthouse watercolor picture',
+            description: 'A lighthouse watercolor picture',
             image: 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Taran_Lighthouse_Kalinigrad_Oblast_Tatiana_Yagunova_Watercolor_painting.jpg',
             name: 'Lighthouse Watercolor'
         }
@@ -48,13 +59,13 @@ class Main extends React.Component {
         const recipe = {
             name: 'Art Piece',
             symbol: 'ART',
-            uriBase: '',
-            schemaId: '',
+            uriBase: 'https://raw.githubusercontent.com/merlox/art-marketplace/master/uriBase.json',
+            schemaId: '0xd3cdf78025cf18c121159c41058359f3d3fb6d3daa0dad4864f9583e6ef0e36a',
             capabilities: [
-                AssetLedgerCapabilities.DESTROY_ASSET,
-                AssetLedgerCapabilities.UPDATE_ASSET,
-                AssetLedgerCapabilities.REVOKE_ASSET,
-                AssetLedgerCapabilities.TOGGLE_ASSET
+                AssetLedgerCapability.DESTROY_ASSET,
+                AssetLedgerCapability.UPDATE_ASSET,
+                AssetLedgerCapability.REVOKE_ASSET,
+                AssetLedgerCapability.TOGGLE_ASSET
             ]
         }
         // This requires a smart contract transaction with gas and such cuz its called a mutation
