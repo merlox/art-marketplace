@@ -1,3 +1,6 @@
 {
-    "$evidence": ""
+    "$evidence": "https://raw.githubusercontent.com/merlox/art-marketplace/master/evidence.json",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$name": "Lighthouse Watercolor",
+    "$image": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Taran_Lighthouse_Kalinigrad_Oblast_Tatiana_Yagunova_Watercolor_painting.jpg"
 }
