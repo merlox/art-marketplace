@@ -15,11 +15,9 @@ class Main extends React.Component {
         this.state = {
             provider: {}
         }
-        this.createNewAsset()
-        // this.start()
     }
 
-    async start() {
+    async componentDidMount() {
         await this.setProvider()
         await this.deployNewAssetLedger()
     }
@@ -64,12 +62,17 @@ class Main extends React.Component {
             capabilities: [
                 AssetLedgerCapability.DESTROY_ASSET,
                 AssetLedgerCapability.UPDATE_ASSET,
-                AssetLedgerCapability.REVOKE_ASSET,
-                AssetLedgerCapability.TOGGLE_ASSET
+                AssetLedgerCapability.TOGGLE_TRANSFERS,
+                AssetLedgerCapability.REVOKE_ASSET
             ]
         }
+
+        console.log('this.state.provider', this.state.provider)
+        console.log('recipe', recipe)
+
         // This requires a smart contract transaction with gas and such cuz its called a mutation
-        const ledgerMutation = await AssetLedger.deploy(this.state.provider, recipe)
+        const ledgerMutation = await AssetLedger.deploy(this.state.provider, recipe).then(mutation => mutation.complete())
+        console.log('Ledger', ledgerMutation)
     }
 
     render() {
