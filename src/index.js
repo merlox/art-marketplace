@@ -24,6 +24,7 @@ class Main extends React.Component {
 
     async setProvider() {
         const provider = new MetamaskProvider()
+        if (!(await provider.isEnabled())) await provider.enable()
         await this.setState({provider})
     }
 
@@ -52,7 +53,10 @@ class Main extends React.Component {
     }
 
     // To create a new asset ledger containing several assets and managed by several individuals
+    // The asset ledger is mandatory to create new assets since they need a place to be stored, they can't exist without a ledger
     async deployNewAssetLedger() {
+        let deployedLedger = {}
+
         // The required keys are name, symbol, uriBase and schemaId
         const recipe = {
             name: 'Art Piece',
@@ -67,12 +71,16 @@ class Main extends React.Component {
             ]
         }
 
-        console.log('this.state.provider', this.state.provider)
-        console.log('recipe', recipe)
+        try {
+            deployedLedger = await AssetLedger.deploy(this.state.provider, recipe).then(mutation => mutation.complete())
+            console.log('Ledger', deployedLedger)
+        } catch (e) {
+            console.log('Error', e)
+        }
 
-        // This requires a smart contract transaction with gas and such cuz its called a mutation
-        const ledgerMutation = await AssetLedger.deploy(this.state.provider, recipe).then(mutation => mutation.complete())
-        console.log('Ledger', ledgerMutation)
+        if (deployedLedger.isCompleted()) {
+            console.log('Ledger address', deployedLedger.receiverId)
+        }
     }
 
     render() {
