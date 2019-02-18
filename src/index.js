@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { MetamaskProvider } from '@0xcert/ethereum-metamask-provider'
+import { schema88 } from '@0xcert/conventions'
+import { Cert } from '@0xcert/cert'
 
 // Assets Ledgers are groups of tokens that are managed by certain users just like mods in a chat to do what's required
 // The Capabilities determine what those mods can do with the assets they are managing
 // The Ethereum address that deploys this ledger has full powers to do whatever he wants as the administrator
 import { AssetLedger, AssetLedgerCapabilities } from '@0xcert/ethereum-asset-ledger'
-import { schema88 } from '@0xcert/conventions'
-import { Cert } from '@0xcert/cert'
 
 class Main extends React.Component {
     constructor() {
@@ -37,8 +37,9 @@ class Main extends React.Component {
             image: 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Taran_Lighthouse_Kalinigrad_Oblast_Tatiana_Yagunova_Watercolor_painting.jpg',
             name: 'Lighthouse Watercolor'
         }
+        // The imprint is the schemaId we need for deploying a ledger
         console.log('Imprint', await cert.imprint(asset))
-        console.log('Disclose', await cert.disclose(asset, [['name', ['image']]]).then(result => JSON.stringify(result)))
+        console.log('Disclose', await cert.disclose(asset, [['name'], ['image']]).then(result => JSON.stringify(result)))
     }
 
     // To create a new asset ledger containing several assets and managed by several individuals
