@@ -13,32 +13,59 @@ class Main extends React.Component {
     constructor() {
         super()
         this.state = {
-            provider: {}
+            provider: {},
+            ledger: {}
         }
     }
 
+    // Get the imprint, deploy a new asset with the existing ledger
+
     async componentDidMount() {
         await this.setProvider()
-        await this.deployNewAssetLedger()
+        await this.setExistingLedger()
+        await this.deployArtAsset()
+        // await this.getBlueprint()
+        // await this.deployNewAssetLedger()
     }
 
+    // To set a metamask provider
     async setProvider() {
         const provider = new MetamaskProvider()
         if (!(await provider.isEnabled())) await provider.enable()
         await this.setState({provider})
     }
 
-    // async start() {
-    //     const provider = new MetamaskProvider()
-    //     const ledgerId = '0xeF5781A2c04113e29bE5724ae6E30bC287610007'
-    //     const ledger = new AssetLedger(provider, ledgerId)
-    //     const balance = await ledger.getBalance('0xeF5781A2c04113e29bE5724ae6E30bC287610007')
-    //     await this.setState({provider})
-    //     console.log('balance', balance)
-    // }
+    // To set the ledger as a state object
+    async setExistingLedger() {
+        const ledgerAddress = '0xE543F07af5b8f57b0325A954DEfb8027a5b89c5A'
+        const ledger = AssetLedger.getInstance(this.state.provider, ledgerAddress)
+        await this.setState({ledger})
+    }
+
+    // To get user ERC721 token balance
+    async getUserBalance() {
+        const balance = await this.state.ledger.getBalance(web3.eth.accounts[0])
+        console.log('balance', balance)
+    }
+
+    // To deploy a new asset
+    async deployArtAsset() {
+        await this.state.ledger.createAsset({
+            id: 5,
+            imprint: 'd3cdf78025cf18c121159c41058359f3d3fb6d3daa0dad4864f9583e6ef0e36a',
+            receiverId: web3.eth.accounts[0]
+        }).then(mutation => {
+            console.log('Creating new asset, this may take a while...')
+            return mutation.complete()
+        }).then(result => {
+            console.log('Deployed!')
+        }).catch(e => {
+            console.log('Error', e)
+        })
+    }
 
     // To generate new ERC721 assets
-    async createNewAsset() {
+    async getBlueprint() {
         const cert = new Cert({
             schema: schema88
         })
