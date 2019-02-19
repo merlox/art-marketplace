@@ -14,18 +14,19 @@ class Main extends React.Component {
         super()
         this.state = {
             provider: {},
-            ledger: {}
+            ledger: {},
+            arts: []
         }
     }
-
-    // Get the imprint, deploy a new asset with the existing ledger
 
     async componentDidMount() {
         await this.setProvider()
         await this.setExistingLedger()
-        await this.deployArtAsset()
+        await this.getUserBalance()
+        await this.getArtAssets()
+        // await this.deployArtAsset()
         // await this.getBlueprint()
-        // await this.deployNewAssetLedger()
+        // await this.deployNewLedger()
     }
 
     // To set a metamask provider
@@ -37,31 +38,9 @@ class Main extends React.Component {
 
     // To set the ledger as a state object
     async setExistingLedger() {
-        const ledgerAddress = '0xE543F07af5b8f57b0325A954DEfb8027a5b89c5A'
+        const ledgerAddress = '0x4F0169f7C3897A891Eb96Bc64257529dd3C5Cb98'
         const ledger = AssetLedger.getInstance(this.state.provider, ledgerAddress)
         await this.setState({ledger})
-    }
-
-    // To get user ERC721 token balance
-    async getUserBalance() {
-        const balance = await this.state.ledger.getBalance(web3.eth.accounts[0])
-        console.log('balance', balance)
-    }
-
-    // To deploy a new asset
-    async deployArtAsset() {
-        await this.state.ledger.createAsset({
-            id: 5,
-            imprint: 'd3cdf78025cf18c121159c41058359f3d3fb6d3daa0dad4864f9583e6ef0e36a',
-            receiverId: web3.eth.accounts[0]
-        }).then(mutation => {
-            console.log('Creating new asset, this may take a while...')
-            return mutation.complete()
-        }).then(result => {
-            console.log('Deployed!')
-        }).catch(e => {
-            console.log('Error', e)
-        })
     }
 
     // To generate new ERC721 assets
@@ -79,9 +58,16 @@ class Main extends React.Component {
         console.log('Disclose', await cert.disclose(asset, [['name'], ['image']]).then(result => JSON.stringify(result)))
     }
 
+    // To get user ERC721 token balance
+    async getUserBalance() {
+        const balance = await this.state.ledger.getBalance(web3.eth.accounts[0])
+        console.log('balance', balance)
+        return balance
+    }
+
     // To create a new asset ledger containing several assets and managed by several individuals
     // The asset ledger is mandatory to create new assets since they need a place to be stored, they can't exist without a ledger
-    async deployNewAssetLedger() {
+    async deployNewLedger() {
         let deployedLedger = {}
 
         // The required keys are name, symbol, uriBase and schemaId
@@ -99,7 +85,10 @@ class Main extends React.Component {
         }
 
         try {
-            deployedLedger = await AssetLedger.deploy(this.state.provider, recipe).then(mutation => mutation.complete())
+            deployedLedger = await AssetLedger.deploy(this.state.provider, recipe).then(mutation => {
+                console.log('Deploying new asset ledger, it may take a few minutes.')
+                return mutation.complete()
+            })
             console.log('Ledger', deployedLedger)
         } catch (e) {
             console.log('Error', e)
@@ -110,9 +99,44 @@ class Main extends React.Component {
         }
     }
 
+    // To deploy a new asset
+    async deployArtAsset() {
+        const assetId = parseInt(await this.getUserBalance()) + 1
+        console.log('id', assetId)
+        await this.state.ledger.createAsset({
+            id: assetId,
+            imprint: 'd3cdf78025cf18c121159c41058359f3d3fb6d3daa0dad4864f9583e6ef0e36a',
+            receiverId: web3.eth.accounts[0]
+        }).then(mutation => {
+            console.log('Creating new asset, this may take a while...')
+            return mutation.complete()
+        }).then(result => {
+            console.log('Deployed!')
+        }).catch(e => {
+            console.log('Error', e)
+        })
+    }
+
+    async getArtAssets() {
+        const userBalance = await this.getUserBalance()
+        for(let i = 1; i <= userBalance; i++) {
+            console.log(await this.state.ledger.getAsset(i))
+        }
+    }
+
     render() {
         return (
-            <div>The project has been setup.</div>
+            <div>
+                <h1>ERC721 Art Marketplace</h1>
+                <p>In this marketplace you can deploy unique art pieces for your account and see them.</p>
+                <div className="art-container">{this.state.arts}</div>
+                <button onClick={() => {
+                    this.deployArtAsset()
+                }}>Deploy Art Piece</button>
+                <button onClick={() => {
+                    this.getArtAssets()
+                }}>Get Art Pieces</button>
+            </div>
         )
     }
 }
