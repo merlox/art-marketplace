@@ -22,9 +22,8 @@ button:hover {
 }
 
 .assets-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: 30% 1fr 1fr;
 }
 
 .art-id {
