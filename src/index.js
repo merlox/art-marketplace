@@ -117,13 +117,6 @@ class Main extends React.Component {
         })
     }
 
-    async getArtAssets() {
-        const userBalance = await this.getUserBalance()
-        for(let i = 1; i <= userBalance; i++) {
-            console.log(await this.state.ledger.getAsset(i))
-        }
-    }
-
     render() {
         return (
             <div>
@@ -136,6 +129,22 @@ class Main extends React.Component {
                 <button onClick={() => {
                     this.getArtAssets()
                 }}>Get Art Pieces</button>
+            </div>
+        )
+    }
+}
+
+class ArtPiece extends React.Component {
+    constructor() {
+        super()
+    }
+
+    render() {
+        return (
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Taran_Lighthouse_Kalinigrad_Oblast_Tatiana_Yagunova_Watercolor_painting.jpg" />
+                <div>Id {this.props.assetId}</div>
+                <div>Owner {web3.eth.accounts[0]}</div>
             </div>
         )
     }
