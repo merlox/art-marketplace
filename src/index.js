@@ -8,22 +8,24 @@ import { Cert } from '@0xcert/cert'
 // The Capabilities determine what those mods can do with the assets they are managing
 // The Ethereum address that deploys this ledger has full powers to do whatever he wants as the administrator
 import { AssetLedger, AssetLedgerCapability } from '@0xcert/ethereum-asset-ledger'
+import './index.css'
 
 class Main extends React.Component {
     constructor() {
         super()
+
         this.state = {
             provider: {},
             ledger: {},
-            arts: []
+            assets: []
         }
     }
 
     async componentDidMount() {
         await this.setProvider()
         await this.setExistingLedger()
-        await this.getUserBalance()
-        await this.getArtAssets()
+        await this.setAssetArray()
+        // await this.getUserBalance()
         // await this.deployArtAsset()
         // await this.getBlueprint()
         // await this.deployNewLedger()
@@ -41,6 +43,19 @@ class Main extends React.Component {
         const ledgerAddress = '0x4F0169f7C3897A891Eb96Bc64257529dd3C5Cb98'
         const ledger = AssetLedger.getInstance(this.state.provider, ledgerAddress)
         await this.setState({ledger})
+    }
+
+    async setAssetArray() {
+        const assets = await this.getUserBalance()
+        let assetArray = []
+        // Generate an array for each asset to create the corresponding ArtPiece components
+        for(let i = 1; i < assets; i++) {
+            assetArray.push(i)
+        }
+        assetArray = assetArray.map(index => (
+            <ArtPiece assetId={index} />
+        ))
+        await this.setState({assets: assetArray})
     }
 
     // To generate new ERC721 assets
@@ -61,7 +76,6 @@ class Main extends React.Component {
     // To get user ERC721 token balance
     async getUserBalance() {
         const balance = await this.state.ledger.getBalance(web3.eth.accounts[0])
-        console.log('balance', balance)
         return balance
     }
 
@@ -121,9 +135,9 @@ class Main extends React.Component {
         return (
             <div>
                 <h1>ERC721 Art Marketplace</h1>
-                <p>In this marketplace you can deploy unique art pieces for your account and see them.</p>
-                <div className="art-container">{this.state.arts}</div>
-                <button onClick={() => {
+                <p>In this marketplace you can deploy unique ERC721 art pieces to the blockchain with 0xcert.</p>
+                <div className="art-container">{this.state.assets}</div>
+                <button className="margin-right" onClick={() => {
                     this.deployArtAsset()
                 }}>Deploy Art Piece</button>
                 <button onClick={() => {
@@ -141,10 +155,10 @@ class ArtPiece extends React.Component {
 
     render() {
         return (
-            <div>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Taran_Lighthouse_Kalinigrad_Oblast_Tatiana_Yagunova_Watercolor_painting.jpg" />
-                <div>Id {this.props.assetId}</div>
-                <div>Owner {web3.eth.accounts[0]}</div>
+            <div className="art-container">
+                <img className="art-image" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Taran_Lighthouse_Kalinigrad_Oblast_Tatiana_Yagunova_Watercolor_painting.jpg" width="300px" />
+                <div className="art-id">{this.props.assetId}</div>
+                <div className="art-owner">{web3.eth.accounts[0]}</div>
             </div>
         )
     }

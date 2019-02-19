@@ -1,0 +1,31 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+button {
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    border: none;
+    background-color: rgb(69, 115, 233);
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.7;
+}
+
+.margin-right {
+    margin-right: 10px;
+}
+
+.art-id {
+    font-size: 18pt;
+    font-weight: bold;
+}
+
+.art-owner {
+    color: grey;
+}
