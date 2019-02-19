@@ -53,7 +53,10 @@ class Main extends React.Component {
             assetArray.push(i)
         }
         assetArray = assetArray.map(index => (
-            <ArtPiece assetId={index} />
+            <ArtPiece
+                assetId={index}
+                key={index}
+            />
         ))
         await this.setState({assets: assetArray})
     }
@@ -136,7 +139,7 @@ class Main extends React.Component {
             <div>
                 <h1>ERC721 Art Marketplace</h1>
                 <p>In this marketplace you can deploy unique ERC721 art pieces to the blockchain with 0xcert.</p>
-                <div className="art-container">{this.state.assets}</div>
+                <div className="assets-container">{this.state.assets}</div>
                 <button className="margin-right" onClick={() => {
                     this.deployArtAsset()
                 }}>Deploy Art Piece</button>

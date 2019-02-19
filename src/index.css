@@ -21,6 +21,12 @@ button:hover {
     margin-right: 10px;
 }
 
+.assets-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
 .art-id {
     font-size: 18pt;
     font-weight: bold;
