@@ -22,12 +22,12 @@ class Main extends React.Component {
     }
 
     async componentDidMount() {
-        await this.setProvider()
-        await this.setExistingLedger()
-        await this.setAssetArray()
+        // await this.setProvider()
+        // await this.setExistingLedger()
+        // await this.setAssetArray()
         // await this.getUserBalance()
         // await this.deployArtAsset()
-        // await this.getBlueprint()
+        await this.getBlueprint()
         // await this.deployNewLedger()
     }
 
@@ -73,7 +73,7 @@ class Main extends React.Component {
         }
         // The imprint is the schemaId we need for deploying a ledger
         console.log('Imprint', await cert.imprint(asset))
-        console.log('Disclose', await cert.disclose(asset, [['name'], ['image']]).then(result => JSON.stringify(result)))
+        console.log('Expose', await cert.expose(asset, [['name'], ['image']]))
     }
 
     // To get user ERC721 token balance
@@ -91,7 +91,7 @@ class Main extends React.Component {
         const recipe = {
             name: 'Art Piece',
             symbol: 'ART',
-            uriBase: 'https://raw.githubusercontent.com/merlox/art-marketplace/master/uriBase.json',
+            uriBase: 'www.example.com/tokenMetadata', // This is a demonstration, you have to setup a server for generating tokens to this URI
             schemaId: '0xd3cdf78025cf18c121159c41058359f3d3fb6d3daa0dad4864f9583e6ef0e36a',
             capabilities: [
                 AssetLedgerCapability.DESTROY_ASSET,
