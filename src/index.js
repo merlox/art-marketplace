@@ -23,10 +23,10 @@ class Main extends React.Component {
     // Run your desired functions here
     async componentDidMount() {
         await this.setProvider()
-        await this.setExistingLedger()
+        const newLedger = await this.deployNewLedger()
+        await this.setExistingLedger(newLedger)
         await this.setAssetArray()
         // await this.deployArtAsset()
-        // await this.deployNewLedger()
     }
 
     // To set a metamask provider
@@ -37,8 +37,8 @@ class Main extends React.Component {
     }
 
     // To set the ledger as a state object
-    async setExistingLedger() {
-        const ledgerAddress = '0x0c2eD196797b2e5a45079BB7bfe8f568Ba2C4d5e'
+    async setExistingLedger(newLedger) {
+        const ledgerAddress = newLedger
         const ledger = AssetLedger.getInstance(this.state.provider, ledgerAddress)
         await this.setState({ledger})
     }
@@ -47,7 +47,7 @@ class Main extends React.Component {
         const assets = await this.getUserBalance()
         let assetArray = []
         // Generate an array for each asset to create the corresponding ArtPiece components
-        for(let i = 1; i < assets; i++) {
+        for(let i = 0; i < assets; i++) {
             assetArray.push(i)
         }
         assetArray = assetArray.map(index => (
@@ -56,6 +56,7 @@ class Main extends React.Component {
                 key={index}
             />
         ))
+        console.log('Assets', assetArray)
         await this.setState({assets: assetArray})
     }
 
@@ -111,22 +112,35 @@ class Main extends React.Component {
 
         if (deployedLedger.isCompleted()) {
             console.log('Ledger address', deployedLedger.receiverId)
+            return deployedLedger.receiverId
         }
     }
 
     // To deploy a new asset
     async deployArtAsset() {
+        const cert = new Cert({
+            schema: schema88
+        })
+        // In your final application you'll want to dinamically generate the asset parameters to create new assets with different imprints
+        const asset = {
+            description: 'A lighthouse watercolor picture',
+            image: 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Taran_Lighthouse_Kalinigrad_Oblast_Tatiana_Yagunova_Watercolor_painting.jpg',
+            name: 'Lighthouse Watercolor'
+        }
+        const imprint = await cert.imprint(asset)
+        console.log('New imprint', imprint)
         const assetId = parseInt(await this.getUserBalance()) + 1
         console.log('id', assetId)
         await this.state.ledger.createAsset({
             id: assetId,
-            imprint: 'd3cdf78025cf18c121159c41058359f3d3fb6d3daa0dad4864f9583e6ef0e36a',
+            imprint: imprint, // You must generate a new imprint for each asset
             receiverId: web3.eth.accounts[0]
         }).then(mutation => {
             console.log('Creating new asset, this may take a while...')
             return mutation.complete()
         }).then(result => {
             console.log('Deployed!')
+            this.setAssetArray() // Update the user interface to show the deployed asset
         }).catch(e => {
             console.log('Error', e)
         })
@@ -142,7 +156,7 @@ class Main extends React.Component {
                     this.deployArtAsset()
                 }}>Deploy Art Piece</button>
                 <button onClick={() => {
-                    this.getArtAssets()
+                    this.setAssetArray()
                 }}>Get Art Pieces</button>
             </div>
         )
